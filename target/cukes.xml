@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<testsuite failures="0" name="cucumber.runtime.formatter.JUnitFormatter" skipped="0" tests="1" time="335.49058">
+<testcase classname="Hyperlinks verification in Documentation page" name="Verification of hyperlinks internal to documentation page" time="335.49058">
+<system-out><![CDATA[Given User loads "https://developer.here.com/documentation".................passed
+Then verify page loads properly and angular is initialized..................passed
+And verify all links on page internal to documentation site are not broken and for each link if page loads and angular is initialized.passed
+]]></system-out>
+</testcase>
+</testsuite>
