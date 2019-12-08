@@ -9,7 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
@@ -32,7 +32,7 @@ public class DocumentationLinksSteps
     NgWebDriver ngDriver;
     HttpURLConnection httpConnect;
 	String documentationPage,url = "";
-    int responseCode = 200;
+    int responseCode = 200,actualResponseCode;
     
 		@Before
 		public void beforeTest() throws Throwable {
@@ -57,8 +57,10 @@ public class DocumentationLinksSteps
 	    public void verify_all_links_on_page__internal_to_documentation_site_are_not_broken_and_for_each_link_if_page_loads_and_angular_is_initialized() throws Throwable {
 	    	try
 	    	{
-	    		List<WebElement> links = driver.findElements(By.tagName("a"));//capture all the links elements in to an array list
+//	    		List<WebElement> links = driver.findElements(By.tagName("a"));//capture all the links elements in to an array list
+	    		List<WebElement> links = driver.findElements(By.xpath("//a[starts-with(@href,'/documentation')]"));
 	    		int linksCount = links.size();//number of links
+//	    		int counter = 0;
 		        for(int i=0;i<linksCount;i++) 
 		        {
 	        	    url = links.get(i).getAttribute("href");
@@ -86,14 +88,21 @@ public class DocumentationLinksSteps
 		                else
 		                {
 		                    System.out.println("URL " +url+ " is a valid link");
+//		                    counter++;
 		                    driver.get(url);
-		                    ngDriver.waitForAngularRequestsToFinish();//Ensure page is fully loaded & hence angular is initialized
+		                    String currentURL = driver.getCurrentUrl();
+		                    httpConnect = (HttpURLConnection)(new URL(currentURL).openConnection());
+			                httpConnect.setRequestMethod("HEAD");
+			                httpConnect.connect();
+			                actualResponseCode = httpConnect.getResponseCode();
+			                Assert.assertEquals(actualResponseCode, responseCode);
+		                    ngDriver.waitForAngularRequestsToFinish();//Ensure page is fully loaded & so that hence angular is initialized
 		                    if(!driver.getCurrentUrl().equals(documentationPage))
 		                    {
 		                    	driver.navigate().back();//to go back to the documentation home page
 		                    }
 		                    ngDriver.waitForAngularRequestsToFinish();//Ensure page is fully loaded 
-		                    links = driver.findElements(By.tagName("a"));// defining web element to handle stale element reference exception
+		                    links = driver.findElements(By.xpath("//a[starts-with(@href,'/documentation')]"));// defining web element to handle stale element reference exception
 		                } 
 		            }
 	                catch (MalformedURLException e) 
@@ -105,6 +114,7 @@ public class DocumentationLinksSteps
 	                	System.out.println(e);
 	                } 
 		        }
+//		        System.out.println("Count of valid links: "+counter);
 		    }
             catch (Exception e) 
             {
